@@ -1,0 +1,35 @@
+#!/bin/bash
+
+export subjects_dir=$PWD
+echo "dirsub=$subjects_dir"
+
+module load java/jre
+module load camino
+
+mkdir AMICO_subjects 
+cd $subjects_dir/DTI_subjects
+
+for i in $(ls -d ?????_?); do #### Reading the main individual subject directory
+
+	cd $subjects_dir/DTI_subjects/$i/"$i"_fieldmap
+	fslsplit DWI_rotbvec_68s_fm.nii.gz
+	cp vol0000.nii.gz b0.nii.gz
+	fslmerge -t DWI_NODDI.nii.gz vol*
+	rm vol*
+	
+	/N/soft/rhel6/fsl/5.0.8/bin/bet $subjects_dir/DTI_subjects/$i/"$i"_fieldmap/b0 $subjects_dir/DTI_subjects/$i/"$i"_fieldmap/b0_brain -f 0.2 -g 0 -m -t
+
+	fslchfiletype NIFTI DWI_rotbvec_68s_fm.nii.gz NODDI_DWI
+	fslchfiletype NIFTI b0_brain_mask.nii.gz roi_mask
+	fsl2scheme -bvecfile DWI_rotbvec.bvec -bvalfile DWI.bval -bscale 1 > NODDI_DWI.scheme
+
+		mkdir $subjects_dir/AMICO_subjects/$i
+		mkdir $subjects_dir/AMICO_subjects/$i/data
+		mv NODDI_DWI.nii $subjects_dir/AMICO_subjects/$i/data
+		mv roi_mask.nii $subjects_dir/AMICO_subjects/$i/data
+		mv NODDI_DWI.scheme $subjects_dir/AMICO_subjects/$i/data
+
+done
+		
+		
+
