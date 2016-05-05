@@ -1,0 +1,20 @@
+#!/bin/bash
+#PBS -l nodes=1:ppn=32,walltime=10:00:00
+#PBS -l gres=ccm
+#PBS -M pkgandhi@iu.edu
+#PBS -m abe
+#PBS -N matlab_AMICO_BR2
+#PBS -o matlab_AMICO.log
+#PBS -e matlab_AMICO_error
+#PBS -V
+
+module load matlab/2013a
+
+cd /N/dc2/scratch/pkgandhi/DTI_denoise/AMICO_subjects
+
+ccmrun matlab -singleCompThread -r AMICO_PRISMA
+
+
+
+
+
